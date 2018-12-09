@@ -21,6 +21,12 @@ var routes = Routes{
 		Index,
 	},
 	Route{
+		"WebhooksGithub",
+		"POST",
+		"/webhooks/github",
+		ReceiveGithub,
+	},
+	Route{
 		"WebhooksBitbucket",
 		"POST",
 		"/webhooks/bitbucket",

@@ -1,16 +1,22 @@
 package main
 
 type GithubWebhook struct {
+	Ref         string `json:"ref"`
+	Respository struct {
+		Name     string `json:"name"`
+		FullName string `json:"full_name"`
+	} `json:"repository"`
 }
 
 type BitbucketWebhook struct {
 	Repository struct {
-		Name string `json:"name"`
+		Name     string `json:"name"`
+		FullName string `json:"full_name"`
 	} `json:"repository"`
 	Push struct {
 		Changes []struct {
 			New struct {
-				Name string `json:"name"`
+				BranchName string `json:"name"`
 			} `json:"new"`
 		} `json:"changes"`
 	} `json:"push"`
