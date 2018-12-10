@@ -1,0 +1,4 @@
+*
+!*.go
+!*.src.json
+!.gitignore
