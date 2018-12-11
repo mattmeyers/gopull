@@ -25,12 +25,14 @@ func ReceiveGithub(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repoName := info.Respository.Name
+	repoFullName := info.Respository.FullName
 	branchName := strings.SplitN(info.Ref, "/", 3)[2]
 
-	fmt.Printf("Github Repo Name: %s\n", info.Respository.Name)
+	fmt.Printf("Github Repo Name: %s\n", repoName)
+	fmt.Printf("Github Repo Full Name: %s\n", repoFullName)
 	fmt.Printf("Github Branch Name: %s\n", branchName)
 
-	GitPull(fmt.Sprintf("/home/matt/%s", repoName))
+	GitPull(GetLocalRepo(repoFullName))
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -52,12 +54,14 @@ func ReceiveBitbucket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repoName := info.Repository.Name
+	repoFullName := info.Repository.FullName
 	branchName := info.Push.Changes[0].New.BranchName
 
 	fmt.Printf("Bitbucket Repo Name: %s\n", repoName)
+	fmt.Printf("Bitbucket Repo Full Name: %s\n", repoFullName)
 	fmt.Printf("Bitbucket Branch Name: %s\n", branchName)
 
-	GitPull(fmt.Sprintf("/home/matt/%s", repoName))
+	GitPull(GetLocalRepo(repoFullName))
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)

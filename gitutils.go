@@ -6,8 +6,8 @@ import (
 	"os/exec"
 )
 
-func GitPull(path string) {
-	cmd := exec.Command("git", "-C", path, "pull")
+func GitPull(repo LocalRepo) {
+	cmd := exec.Command(fmt.Sprintf("./deployment_scripts/%s", repo.DeploymentScript), repo.Path)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
