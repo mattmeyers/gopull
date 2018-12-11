@@ -8,10 +8,11 @@ import (
 )
 
 type LocalRepo struct {
-	Name     string `json:"name"`
-	FullName string `json:"fullName"`
-	Branch   string `json:"branch"`
-	Path     string `json:"path"`
+	Name             string `json:"name"`
+	FullName         string `json:"fullName"`
+	Branch           string `json:"branch"`
+	Path             string `json:"path"`
+	DeploymentScript string `json:"deploymentScript"`
 }
 
 func GetAllLocalRepos() map[string]LocalRepo {

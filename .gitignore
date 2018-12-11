@@ -1,4 +1,6 @@
 *
+!/deployment_scripts/
+!/deployment_scripts/deploy.src.sh
 !*.go
 !*.src.json
 !.gitignore

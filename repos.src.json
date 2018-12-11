@@ -3,6 +3,7 @@
     "name": "",
     "fullName": "",
     "branch": "",
-    "path": ""
+    "path": "",
+    "deploymentScript": ""
   }
 }
