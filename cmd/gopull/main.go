@@ -12,6 +12,7 @@ func main() {
 	// Subcommands
 	addRepoCommand := flag.NewFlagSet("add-repo", flag.ExitOnError)
 	editRepoCommand := flag.NewFlagSet("edit-repo", flag.ExitOnError)
+	deleteRepoCommand := flag.NewFlagSet("delete-repo", flag.ExitOnError)
 
 	// Add-Repo subcommand flag pointers
 	addRepoFullNamePtr := addRepoCommand.String("fullname", "", "Full name of the remote repository. Of the form \"<User>/<Repository Name>\". (Required)")
@@ -21,10 +22,11 @@ func main() {
 	editRepoFullNamePtr := editRepoCommand.String("fullname", "", "Full name of the remote repository. Of the form \"<User>/<Repository Name>\".")
 	editRepoBranchPtr := editRepoCommand.String("branch", "", "Branch to use.")
 
-	flag.Parse()
+	// Delete-Repo subcommand flag pointers
+	deleteRepoFullNamePtr := deleteRepoCommand.String("fullname", "", "Full name of the remote repository. Of the form \"<User>/<Repository Name>\". (Required)")
 
 	if len(os.Args) < 2 {
-		fmt.Println("add-repo or edit-repo subcommand is required")
+		printUsage()
 		os.Exit(1)
 	}
 
@@ -33,8 +35,10 @@ func main() {
 		addRepoCommand.Parse(os.Args[2:])
 	case "edit-repo":
 		editRepoCommand.Parse(os.Args[2:])
+	case "delete-repo":
+		deleteRepoCommand.Parse(os.Args[2:])
 	default:
-		flag.PrintDefaults()
+		printUsage()
 		os.Exit(1)
 	}
 
@@ -56,6 +60,23 @@ func main() {
 			editRepoCommand.PrintDefaults()
 			os.Exit(1)
 		}
+	} else if deleteRepoCommand.Parsed() {
+		// Required flags
+		if *deleteRepoFullNamePtr == "" {
+			deleteRepoCommand.PrintDefaults()
+			os.Exit(1)
+		}
+
+		DeleteLocalRepo(*deleteRepoFullNamePtr)
 	}
 
+}
+
+func printUsage() {
+	fmt.Print("gopull command line tools\n\n")
+	fmt.Print("Usage: gopull <command> [options]\n\n")
+	fmt.Println("Available sub-commands:")
+	fmt.Println("  add-repo\tAdd a new local repo configuration.")
+	fmt.Println("  edit-repo\tEdit a local repo configuration.")
+	fmt.Println("  delete-repo\tEdit a local repo configuration.")
 }
