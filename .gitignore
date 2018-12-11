@@ -1,4 +1,6 @@
 *
+!/cmd
+!/cmd/*
 !/deployment_scripts/
 !/deployment_scripts/deploy.src.sh
 !*.go
