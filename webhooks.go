@@ -23,4 +23,9 @@ type BitbucketWebhook struct {
 }
 
 type GitlabWebhook struct {
+	Project struct {
+		Name     string `json:"name"`
+		FullName string `json:"path_with_namespace"`
+	} `json:"project"`
+	Ref string `json:"ref"`
 }
