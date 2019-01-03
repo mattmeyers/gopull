@@ -37,8 +37,10 @@ func DeleteLocalRepo(repo string) {
 }
 
 func readInFile() map[string]LocalRepo {
+	filePath := fmt.Sprintf("%s/repos.json", os.Getenv("GOPULL_DIR"))
+
 	var repos map[string]LocalRepo
-	configFile, err := os.Open("repos.json")
+	configFile, err := os.Open(filePath)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to open repos.json\n%s", err))
 	}
@@ -52,11 +54,13 @@ func readInFile() map[string]LocalRepo {
 }
 
 func writeToFile(repos map[string]LocalRepo) {
+	filePath := fmt.Sprintf("%s/repos.json", os.Getenv("GOPULL_DIR"))
+
 	reposJson, err := json.Marshal(repos)
 	if err != nil {
 		panic(err)
 	}
-	if err = ioutil.WriteFile("repos.json", reposJson, 0644); err != nil {
+	if err = ioutil.WriteFile(filePath, reposJson, 0644); err != nil {
 		panic(err)
 	}
 
