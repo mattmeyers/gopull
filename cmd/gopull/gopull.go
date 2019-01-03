@@ -22,42 +22,38 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:  "repo",
-			Usage: "Configure local repositories",
+			Name:   "list",
+			Usage:  "List configure local repos",
+			Action: handleList,
+		},
+		{
+			Name:  "add",
+			Usage: "Add a new repository",
 			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "list, l",
-					Usage: "List all currently configured local repos.",
+				cli.StringFlag{
+					Name:  "user",
+					Usage: "Owner of the repo. (Required)",
+				},
+				cli.StringFlag{
+					Name:  "name",
+					Usage: "Name of the repo. (Required)",
+				},
+				cli.StringFlag{
+					Name:  "branch",
+					Usage: "Branch to be pulled. (Required)",
 				},
 			},
-			Action: handleRepo,
-			Subcommands: []cli.Command{
-				{
-					Name:  "add",
-					Usage: "Add a new repository",
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name:  "name",
-							Usage: "Full name of the new repo. Of the form \"<User>/<Repo>\". (Required)",
-						},
-						cli.StringFlag{
-							Name:  "branch",
-							Usage: "Branch to be pulled. (Required)",
-						},
-					},
-					Action: handleRepoAdd,
-				},
-				{
-					Name:   "edit",
-					Usage:  "Edit an existing repository",
-					Action: handleRepoEdit,
-				},
-				{
-					Name:   "delete",
-					Usage:  "Delete a repository",
-					Action: handleRepoDelete,
-				},
-			},
+			Action: handleAdd,
+		},
+		{
+			Name:   "edit",
+			Usage:  "Edit an existing repository",
+			Action: handleEdit,
+		},
+		{
+			Name:   "delete",
+			Usage:  "Delete a repository",
+			Action: handleDelete,
 		},
 	}
 
@@ -67,33 +63,42 @@ func main() {
 	}
 }
 
-func handleRepo(c *cli.Context) error {
-	if c.Bool("list") {
-		repos := GetAllLocalRepos()
-		for _, repo := range repos {
-			fmt.Println(repo.FullName)
-		}
-		return nil
+func handleList(c *cli.Context) error {
+	repos := GetAllLocalRepos()
+	for _, repo := range repos {
+		fmt.Println(repo.FullName)
 	}
-
-	cli.ShowSubcommandHelp(c)
 	return nil
 }
 
-func handleRepoAdd(c *cli.Context) error {
-	if c.String("name") == "" || c.String("branch") == "" {
+func handleAdd(c *cli.Context) error {
+	user := c.String("user")
+	name := c.String("name")
+	branch := c.String("branch")
+
+	if user == "" || name == "" || branch == "" {
 		cli.ShowCommandHelpAndExit(c, "add", 1)
 	}
-	fmt.Printf("Repo name: %s\nBranch name: %s\n", c.String("name"), c.String("branch"))
+
+	repo := LocalRepo{
+		Name:             name,
+		FullName:         fmt.Sprintf("%s/%s", user, name),
+		Branch:           branch,
+		Path:             fmt.Sprintf("%s/%s/%s", os.Getenv("REPOS_DIR"), user, name),
+		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", os.Getenv("GOPULL_DIR"), name),
+	}
+
+	AddLocalRepo(repo)
+
 	return nil
 }
 
-func handleRepoEdit(c *cli.Context) error {
+func handleEdit(c *cli.Context) error {
 	fmt.Println("Edited repo")
 	return nil
 }
 
-func handleRepoDelete(c *cli.Context) error {
+func handleDelete(c *cli.Context) error {
 	fmt.Println("Deleted repo")
 	return nil
 }
