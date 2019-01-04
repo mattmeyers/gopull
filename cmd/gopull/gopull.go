@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
@@ -22,6 +23,21 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
+			Name:   "config",
+			Usage:  "Configure the GoPull environment",
+			Action: handleConfig,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "repos-dir, r",
+					Usage: "Set the base directory where repositories are located. Defaults to \"$HOME/repos\"",
+				},
+				cli.StringFlag{
+					Name:  "gopull-dir, g",
+					Usage: "Set the GoPull API directory. Defaults to \"$GOPATH/src/gopull\"",
+				},
+			},
+		},
+		{
 			Name:   "list",
 			Usage:  "List configure local repos",
 			Action: handleList,
@@ -31,12 +47,8 @@ func main() {
 			Usage: "Add a new repository",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "user",
-					Usage: "Owner of the repo. (Required)",
-				},
-				cli.StringFlag{
-					Name:  "name",
-					Usage: "Name of the repo. (Required)",
+					Name:  "uri",
+					Usage: "SSH URI of the repo. Of the form \"git@<remote>:<user>/<repository>\". (Required)",
 				},
 				cli.StringFlag{
 					Name:  "branch",
@@ -63,6 +75,36 @@ func main() {
 	}
 }
 
+func handleConfig(c *cli.Context) error {
+	reposDir := c.String("repos-dir")
+
+	if reposDir != "" {
+		env := map[string]string{"REPOS_DIR": reposDir, "GOPULL_DIR": os.Getenv("GOPULL_DIR")}
+		// env, err := godotenv.Unmarshal({"REPOS_DIR": reposDir, "GOPULL_DIR": os.Getenv("GOPULL_DIR")})
+		// if err != nil {
+		// 	log.Fatal("Could not unmarshal REPOS_DIR")
+		// }
+		err := godotenv.Write(env, fmt.Sprintf("%s/cmd/gopull/.env", os.Getenv("GOPULL_DIR")))
+		if err != nil {
+			log.Fatalf("Could not write to .env\nerr: %s", err)
+		}
+
+		return nil
+	}
+
+	var env map[string]string
+	env, err := godotenv.Read(fmt.Sprintf("%s/cmd/gopull/.env", os.Getenv("GOPULL_DIR")))
+	if err != nil {
+		log.Fatalf("Could not read .env file\nerr: %s", err)
+	}
+
+	for key, val := range env {
+		fmt.Printf("%s=%s\n", key, val)
+	}
+
+	return nil
+}
+
 func handleList(c *cli.Context) error {
 	repos := GetAllLocalRepos()
 	for _, repo := range repos {
@@ -72,23 +114,29 @@ func handleList(c *cli.Context) error {
 }
 
 func handleAdd(c *cli.Context) error {
-	user := c.String("user")
-	name := c.String("name")
+	uri := c.String("uri")
 	branch := c.String("branch")
 
-	if user == "" || name == "" || branch == "" {
+	if uri == "" || branch == "" {
 		cli.ShowCommandHelpAndExit(c, "add", 1)
 	}
 
+	fullName := strings.Replace(strings.SplitN(uri, ":", 2)[1], ".git", "", 1)
+	repoPathVars := strings.SplitN(fullName, "/", 2)
+	user := repoPathVars[0]
+	name := repoPathVars[1]
+
 	repo := LocalRepo{
+		User:             user,
 		Name:             name,
-		FullName:         fmt.Sprintf("%s/%s", user, name),
+		FullName:         fullName,
 		Branch:           branch,
 		Path:             fmt.Sprintf("%s/%s/%s", os.Getenv("REPOS_DIR"), user, name),
 		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", os.Getenv("GOPULL_DIR"), name),
 	}
 
 	AddLocalRepo(repo)
+	GitClone(uri, repo)
 
 	return nil
 }
