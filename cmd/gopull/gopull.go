@@ -31,10 +31,10 @@ func main() {
 					Name:  "repos-dir, r",
 					Usage: "Set the base directory where repositories are located. Defaults to \"$HOME/repos\"",
 				},
-				cli.StringFlag{
-					Name:  "gopull-dir, g",
-					Usage: "Set the GoPull API directory. Defaults to \"$GOPATH/src/gopull\"",
-				},
+				// cli.StringFlag{
+				// 	Name:  "gopull-dir, g",
+				// 	Usage: "Set the GoPull API directory. Defaults to \"$GOPATH/src/gopull\"",
+				// },
 			},
 		},
 		{
@@ -79,11 +79,11 @@ func handleConfig(c *cli.Context) error {
 	reposDir := c.String("repos-dir")
 
 	if reposDir != "" {
-		env := map[string]string{"REPOS_DIR": reposDir, "GOPULL_DIR": os.Getenv("GOPULL_DIR")}
-		// env, err := godotenv.Unmarshal({"REPOS_DIR": reposDir, "GOPULL_DIR": os.Getenv("GOPULL_DIR")})
-		// if err != nil {
-		// 	log.Fatal("Could not unmarshal REPOS_DIR")
-		// }
+		env := map[string]string{
+			"REPOS_DIR":  reposDir,
+			"GOPULL_DIR": os.Getenv("GOPULL_DIR"),
+		}
+
 		err := godotenv.Write(env, fmt.Sprintf("%s/cmd/gopull/.env", os.Getenv("GOPULL_DIR")))
 		if err != nil {
 			log.Fatalf("Could not write to .env\nerr: %s", err)
@@ -135,8 +135,8 @@ func handleAdd(c *cli.Context) error {
 		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", os.Getenv("GOPULL_DIR"), name),
 	}
 
-	AddLocalRepo(repo)
 	GitClone(uri, repo)
+	AddLocalRepo(repo)
 
 	return nil
 }
