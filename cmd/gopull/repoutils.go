@@ -8,6 +8,7 @@ import (
 )
 
 type LocalRepo struct {
+	User             string `json:"user"`
 	Name             string `json:"name"`
 	FullName         string `json:"fullName"`
 	Branch           string `json:"branch"`
