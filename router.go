@@ -1,7 +1,7 @@
 package main
 
 import (
-	"apilogger"
+	"github.com/mattmeyers/apilogger"
 	"net/http"
 
 	"github.com/gorilla/mux"
