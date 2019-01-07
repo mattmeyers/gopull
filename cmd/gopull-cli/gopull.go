@@ -5,13 +5,23 @@ import (
 	"log"
 	"os"
 	"strings"
+	"runtime"
+	"path"
 
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
 )
 
+var _dir string
+
 func main() {
-	err := godotenv.Load()
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		log.Fatal("No caller information")
+	}
+	_dir = path.Dir(filename)
+
+	err := godotenv.Load(fmt.Sprintf("%s/.env", _dir))
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -84,7 +94,7 @@ func handleConfig(c *cli.Context) error {
 			"GOPULL_DIR": os.Getenv("GOPULL_DIR"),
 		}
 
-		err := godotenv.Write(env, fmt.Sprintf("%s/cmd/gopull/.env", os.Getenv("GOPULL_DIR")))
+		err := godotenv.Write(env, fmt.Sprintf("%s/.env", _dir))
 		if err != nil {
 			log.Fatalf("Could not write to .env\nerr: %s", err)
 		}
@@ -93,7 +103,7 @@ func handleConfig(c *cli.Context) error {
 	}
 
 	var env map[string]string
-	env, err := godotenv.Read(fmt.Sprintf("%s/cmd/gopull/.env", os.Getenv("GOPULL_DIR")))
+	env, err := godotenv.Read(fmt.Sprintf("%s/.env", _dir))
 	if err != nil {
 		log.Fatalf("Could not read .env file\nerr: %s", err)
 	}
