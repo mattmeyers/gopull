@@ -6,3 +6,5 @@
 !*.go
 !*.src.json
 !.gitignore
+LICENSE
+README.md

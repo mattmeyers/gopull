@@ -7,6 +7,17 @@ import (
 	"os/exec"
 )
 
+// GitClone creates a proper directory structure before cloning a remote repository.
+//
+// Remote repositories are assumed to take the form "git@<remote>:<user>/<repository>"
+// and so the directory structure $REPOS_DIR/<user> is created. Then the repository is
+// cloned creating the final structure of $REPOS_DIR/<user>/<repository>.
+//
+// Before a repository can be cloned, an SSH key must be added to the remote. Refer to
+// the remote's documentation for further information:
+//		- Bitbucket: https://confluence.atlassian.com/bitbucket/access-keys-294486051.html
+//		- Github: https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
+//		- Gitlab: https://docs.gitlab.com/ee/ssh/
 func GitClone(uri string, repo LocalRepo) {
 	mkdir := exec.Command("mkdir", fmt.Sprintf("%s/%s", os.Getenv("REPOS_DIR"), repo.User))
 	out, err := mkdir.CombinedOutput()

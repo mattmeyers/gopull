@@ -7,6 +7,12 @@ import (
 	"os"
 )
 
+// LocalRepo holds all information about a local repository being
+// managed by GoPull.
+//
+// This struct is used to interact with the repos.json configuration
+// file located in $GOPULL_DIR. That configuration file contains a
+// list of objects that map to the LocalRepo struct.
 type LocalRepo struct {
 	User             string `json:"user"`
 	Name             string `json:"name"`
@@ -16,21 +22,29 @@ type LocalRepo struct {
 	DeploymentScript string `json:"deploymentScript"`
 }
 
+// GetAllLocalRepos gets all of the repositories from the repos.json
+// configuration file.
 func GetAllLocalRepos() map[string]LocalRepo {
 	return readInFile()
 }
 
+// GetLocalRepo gets a single repository configuration from the repos.json
+// configuration file.
 func GetLocalRepo(name string) LocalRepo {
 	repos := readInFile()
 	return repos[name]
 }
 
+// AddLocalRepo adds a new local repository configuration to the repos.json
+// configuration file.
 func AddLocalRepo(repo LocalRepo) {
 	repos := readInFile()
 	repos[repo.FullName] = repo
 	writeToFile(repos)
 }
 
+// DeleteLocalRepo deletes a local repository configuration from the
+// repos.json configuration file.
 func DeleteLocalRepo(repo string) {
 	repos := readInFile()
 	delete(repos, repo)
