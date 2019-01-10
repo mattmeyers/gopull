@@ -5,25 +5,20 @@ import (
 	"log"
 	"os"
 	"strings"
-	"runtime"
-	"path"
 
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
+
 	"github.com/urfave/cli"
 )
 
 var _dir string
 
 func main() {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatal("No caller information")
-	}
-	_dir = path.Dir(filename)
-
-	err := godotenv.Load(fmt.Sprintf("%s/.env", _dir))
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic(fmt.Errorf("fatal error reading config file: %s", err))
 	}
 
 	app := cli.NewApp()
@@ -89,27 +84,15 @@ func handleConfig(c *cli.Context) error {
 	reposDir := c.String("repos-dir")
 
 	if reposDir != "" {
-		env := map[string]string{
-			"REPOS_DIR":  reposDir,
-			"GOPULL_DIR": os.Getenv("GOPULL_DIR"),
-		}
-
-		err := godotenv.Write(env, fmt.Sprintf("%s/.env", _dir))
+		viper.Set("repos_dir", reposDir)
+		err := viper.WriteConfig()
 		if err != nil {
-			log.Fatalf("Could not write to .env\nerr: %s", err)
+			log.Fatalf("Failed to write to config\nerr: %s", err)
 		}
-
-		return nil
 	}
 
-	var env map[string]string
-	env, err := godotenv.Read(fmt.Sprintf("%s/.env", _dir))
-	if err != nil {
-		log.Fatalf("Could not read .env file\nerr: %s", err)
-	}
-
-	for key, val := range env {
-		fmt.Printf("%s=%s\n", key, val)
+	for _, key := range viper.AllKeys() {
+		fmt.Printf("%s=%s\n", key, viper.GetString(key))
 	}
 
 	return nil
@@ -141,8 +124,8 @@ func handleAdd(c *cli.Context) error {
 		Name:             name,
 		FullName:         fullName,
 		Branch:           branch,
-		Path:             fmt.Sprintf("%s/%s/%s", os.Getenv("REPOS_DIR"), user, name),
-		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", os.Getenv("GOPULL_DIR"), name),
+		Path:             fmt.Sprintf("%s/%s/%s", viper.GetString("repos_dir"), user, name),
+		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", viper.GetString("gopull_dir"), name),
 	}
 
 	GitClone(uri, repo)

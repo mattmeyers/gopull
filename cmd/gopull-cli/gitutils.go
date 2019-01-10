@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
+
+	"github.com/spf13/viper"
 )
 
 // GitClone creates a proper directory structure before cloning a remote repository.
@@ -19,16 +20,16 @@ import (
 //		- Github: https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 //		- Gitlab: https://docs.gitlab.com/ee/ssh/
 func GitClone(uri string, repo LocalRepo) {
-	mkdir := exec.Command("mkdir", fmt.Sprintf("%s/%s", os.Getenv("REPOS_DIR"), repo.User))
+	mkdir := exec.Command("mkdir", fmt.Sprintf("%s/%s", viper.GetString("repos_dir"), repo.User))
 	out, err := mkdir.CombinedOutput()
 	if err != nil {
 		log.Printf("cmd.CombinedOutput() failed with %s\n", err)
 	} else {
-		log.Printf("Created directory: %s/%s\n", os.Getenv("REPOS_DIR"), repo.User)
+		log.Printf("Created directory: %s/%s\n", viper.GetString("repos_dir"), repo.User)
 	}
 
 	clone := exec.Command("git", "clone", "--single-branch", "--branch", repo.Branch, uri)
-	clone.Dir = os.Getenv("REPOS_DIR") + "/" + repo.User
+	clone.Dir = viper.GetString("repos_dir") + "/" + repo.User
 	out, err = clone.CombinedOutput()
 	if err != nil {
 		log.Fatalf("cmd.CombinedOutput() failed with %s\nDid you remember to add your SSH key to the remote?", err)

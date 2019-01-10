@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 // LocalRepo holds all information about a local repository being
@@ -52,7 +54,7 @@ func DeleteLocalRepo(repo string) {
 }
 
 func readInFile() map[string]LocalRepo {
-	filePath := fmt.Sprintf("%s/repos.json", os.Getenv("GOPULL_DIR"))
+	filePath := fmt.Sprintf("%s/repos.json", viper.GetString("gopull_dir"))
 
 	var repos map[string]LocalRepo
 	configFile, err := os.Open(filePath)
@@ -69,7 +71,7 @@ func readInFile() map[string]LocalRepo {
 }
 
 func writeToFile(repos map[string]LocalRepo) {
-	filePath := fmt.Sprintf("%s/repos.json", os.Getenv("GOPULL_DIR"))
+	filePath := fmt.Sprintf("%s/repos.json", viper.GetString("gopull_dir"))
 
 	reposJson, err := json.Marshal(repos)
 	if err != nil {
