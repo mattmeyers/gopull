@@ -2,7 +2,7 @@
 
 GoPull is a lightweight REST API written in go that runs a deployment script after receiving a webhook request from Bitbucket, GitHub, or GitLab. All local repositories configured to work with GoPull must be placed in the same directory known as `REPOS_DIR`. In order for this API to access the remote repository, an SSH access key must be added to the remote. A webhook can then be configured to fire on any events supported by the remote (code push by default). When the API receives a request, it checks which branch was affected by the change. If this branch matches the configured branch of the local repository, then the corresponding deployment script is run.
 
-This API features a command line tool for easily adding new repositories or configuring current local repositories. In order for the CLI tool to work, the `.env` file must be set up to provide paths to the local installation of GoPull and `REPOS_DIR`.
+This API features a command line tool for easily adding new repositories or configuring current local repositories. By default, this tool assumes GoPull is installed in `$GOPATH/src/github.com/mattmeyers/gopull` and that all managed repositories are to be placed in `$HOME/repos`.  These paths can be configured with the command line tool itself.
 
 ## Installation
 
@@ -12,7 +12,7 @@ GoPull can be installed by running
 go get -u github.com/mattmeyers/gopull/...
 ```
 
-This command will install the `gopull` and `gopull-cli`.
+This command will install the `gopull` and `gopull-cli` binaries.
 
 ## Running the API
 
@@ -96,5 +96,52 @@ Use the following GoPull REST endpoints when configuring the webhooks
 Finally, the repository can be cloned using ssh. By default, repositories are cloned into `$HOME/repos`. Because GoPull only cares about a single branch, it's a good idea to only clone that branch using
 
 ```
-git clone --single-branch --branch <BRANCH> git@<REMOTE>:<USER>/<REPOSITORY>
+git clone --single-branch --branch <BRANCH> \
+    git@<REMOTE>:<USER>/<REPOSITORY>
 ```
+
+## gopull-cli
+
+GoPull ships with a command line tool that makes setting up and configuring repositories much easier.
+
+```
+NAME:
+   gopull-cli - Configure the GoPull REST API to pull remote repo changes
+
+USAGE:
+   gopull-cli [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.1
+
+COMMANDS:
+     config   Configure the GoPull environment
+     list     List configure local repos
+     add      Add a new repository
+     edit     Edit an existing repository
+     delete   Delete a repository
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
+```
+
+### Configuring the GoPull Environment
+
+Variables used by GoPull can be set using `gopull-cli config`.  Passing no flags will simply print the currently configured values.  Passing the `--repos-dir` or `-r` with a value will set the `REPOS_DIR` path.
+
+### Adding a New Repository
+
+In order to initialize a local managed repository, follow the instructions above for adding your ssh key to the remote as well as configuring the webhook.  Then use the command
+
+```
+gopull-cli add --uri git@<REMOTE>:<USER>/<REPOSITORY> --branch <BRANCH>
+```
+
+This will clone the repository into `REPOS_DIR/<USER>/<REPOSITORY>`, add the configuration entry to `repos.json`, and copy the deployment script template.
+
+## Release History
+
+* 0.0.1
+    * Work in progress
