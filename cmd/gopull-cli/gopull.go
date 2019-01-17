@@ -7,10 +7,8 @@ import (
 	"github.com/urfave/cli"
 )
 
-var _dir string
-
 func main() {
-	InitConfig("config")
+	InitConfig()
 
 	app := cli.NewApp()
 	app.Name = "gopull-cli"
@@ -35,7 +33,7 @@ func main() {
 		},
 		{
 			Name:   "list",
-			Usage:  "List configure local repos",
+			Usage:  "List configured local repos",
 			Action: handleList,
 		},
 		{

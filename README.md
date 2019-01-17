@@ -116,7 +116,7 @@ VERSION:
 
 COMMANDS:
      config   Configure the GoPull environment
-     list     List configure local repos
+     list     List configured local repos
      add      Add a new repository
      edit     Edit an existing repository
      delete   Delete a repository
