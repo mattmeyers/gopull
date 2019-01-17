@@ -22,13 +22,17 @@ func main() {
 			Action: handleConfig,
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "repos-dir, r",
+					Name:  "repos-dir",
 					Usage: "Set the base directory where repositories are located. Defaults to \"$HOME/repos\"",
 				},
-				// cli.StringFlag{
-				// 	Name:  "gopull-dir, g",
-				// 	Usage: "Set the GoPull API directory. Defaults to \"$GOPATH/src/gopull\"",
-				// },
+				cli.StringFlag{
+					Name:  "gopull-dir",
+					Usage: "Set the GoPull API directory. Defaults to \"$GOPATH/src/github.com/mattmeyers/gopull\"",
+				},
+				cli.StringFlag{
+					Name:  "scripts-dir",
+					Usage: "Set the deployment scripts directory. Defaults to \"$GOPATH/src/github.com/mattmeyers/gopull/deployment_scripts\"",
+				},
 			},
 		},
 		{

@@ -129,7 +129,7 @@ GLOBAL OPTIONS:
 
 ### Configuring the GoPull Environment
 
-Variables used by GoPull can be set using `gopull-cli config`.  Passing no flags will simply print the currently configured values.  Passing the `--repos-dir` or `-r` with a value will set the `REPOS_DIR` path.
+Variables used by GoPull can be set using `gopull-cli config`.  Passing no flags will simply print the currently configured values.  Passing the `--repos-dir` flag with a value will set the `REPOS_DIR` path. Similarly, passing the `--gopull-dir` flag with a value will set the `GOPULL_DIR`.
 
 ### Adding a New Repository
 

@@ -11,9 +11,18 @@ import (
 
 func handleConfig(c *cli.Context) error {
 	reposDir := c.String("repos-dir")
+	gopullDir := c.String("gopull-dir")
 
 	if reposDir != "" {
 		viper.Set("repos_dir", reposDir)
+		err := viper.WriteConfig()
+		if err != nil {
+			log.Fatalf("Failed to write to config\nerr: %s", err)
+		}
+	}
+
+	if gopullDir != "" {
+		viper.Set("gopull_dir", gopullDir)
 		err := viper.WriteConfig()
 		if err != nil {
 			log.Fatalf("Failed to write to config\nerr: %s", err)
@@ -58,7 +67,8 @@ func handleAdd(c *cli.Context) error {
 	}
 
 	GitClone(uri, repo)
-	AddLocalRepo(repo)
+	repo.AddLocalRepo()
+	repo.InitDeploymentScript()
 
 	return nil
 }

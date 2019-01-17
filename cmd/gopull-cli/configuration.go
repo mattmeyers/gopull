@@ -29,9 +29,12 @@ func InitConfig() {
 	viper.AddConfigPath(dir)
 	err := viper.ReadInConfig()
 	if err != nil {
-		if _, err = os.Create(fmt.Sprintf("%s/config.json", dir)); err != nil {
+		file, err := os.Create(fmt.Sprintf("%s/config.json", dir))
+		if err != nil {
 			panic(fmt.Errorf("fatal error creating config.json: %s", err))
 		}
+		defer file.Close()
+
 		if err = viper.WriteConfig(); err != nil {
 			panic(fmt.Errorf("fatal error writing default config: %s", err))
 		}
@@ -42,4 +45,5 @@ func InitConfig() {
 func setDefaults() {
 	viper.SetDefault("repos_dir", "$HOME/repos")
 	viper.SetDefault("gopull_dir", "$GOPATH/src/github.com/mattmeyers/gopull")
+	viper.SetDefault("scripts_dir", "$GOPATH/src/github.com/mattmeyers/gopull/deployment_scripts")
 }

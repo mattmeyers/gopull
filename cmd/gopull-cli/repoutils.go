@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/spf13/viper"
@@ -24,6 +26,36 @@ type LocalRepo struct {
 	DeploymentScript string `json:"deploymentScript"`
 }
 
+// AddLocalRepo adds a new local repository configuration to the repos.json
+// configuration file.
+func (r LocalRepo) AddLocalRepo() {
+	repos := readInFile()
+	repos[r.FullName] = r
+	writeToFile(repos)
+}
+
+// InitDeploymentScript copies the sample deployment script for use with the
+// new local repository.
+func (r LocalRepo) InitDeploymentScript() {
+	from, err := os.Open(fmt.Sprintf("%s/deploy.src.sh", os.ExpandEnv(viper.GetString("scripts_dir"))))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer from.Close()
+
+	newFilename := fmt.Sprintf("%s/%s_deploy.sh", os.ExpandEnv(viper.GetString("scripts_dir")), r.Name)
+	to, err := os.OpenFile(newFilename, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer to.Close()
+
+	_, err = io.Copy(to, from)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // GetAllLocalRepos gets all of the repositories from the repos.json
 // configuration file.
 func GetAllLocalRepos() map[string]LocalRepo {
@@ -35,14 +67,6 @@ func GetAllLocalRepos() map[string]LocalRepo {
 func GetLocalRepo(name string) LocalRepo {
 	repos := readInFile()
 	return repos[name]
-}
-
-// AddLocalRepo adds a new local repository configuration to the repos.json
-// configuration file.
-func AddLocalRepo(repo LocalRepo) {
-	repos := readInFile()
-	repos[repo.FullName] = repo
-	writeToFile(repos)
 }
 
 // DeleteLocalRepo deletes a local repository configuration from the
@@ -73,11 +97,11 @@ func readInFile() map[string]LocalRepo {
 func writeToFile(repos map[string]LocalRepo) {
 	filePath := fmt.Sprintf("%s/repos.json", os.ExpandEnv(viper.GetString("gopull_dir")))
 
-	reposJson, err := json.Marshal(repos)
+	reposJSON, err := json.Marshal(repos)
 	if err != nil {
 		panic(err)
 	}
-	if err = ioutil.WriteFile(filePath, reposJson, 0644); err != nil {
+	if err = ioutil.WriteFile(filePath, reposJSON, 0644); err != nil {
 		panic(err)
 	}
 
