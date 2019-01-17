@@ -12,11 +12,11 @@ GoPull can be installed by running
 go get -u github.com/mattmeyers/gopull/...
 ```
 
-This command will install the `gopull` and `gopull-cli` binaries.
+This command will install the `gopull` and `gopull-api` binaries.
 
 ## Running the API
 
-Executing the `gopull` binary will start the API as a process. There are a variety of process managers that can be used to handle the REST API. If you are using Ubuntu or another operating system that uses systemd, GoPull can be run as a systemd service. All that is needed is a `gopull.service` configuration file. A simple configuration is as follows.
+Executing the `gopull-api` binary will start the API as a process. There are a variety of process managers that can be used to handle the REST API. If you are using Ubuntu or another operating system that uses systemd, GoPull can be run as a systemd service. All that is needed is a `gopull.service` configuration file. A simple configuration is as follows.
 
 ```
 [Unit]
@@ -100,7 +100,7 @@ git clone --single-branch --branch <BRANCH> \
     git@<REMOTE>:<USER>/<REPOSITORY>
 ```
 
-## gopull-cli
+## Command Line Tool
 
 GoPull ships with a command line tool that makes setting up and configuring repositories much easier.
 
@@ -109,7 +109,7 @@ NAME:
    gopull-cli - Configure the GoPull REST API to pull remote repo changes
 
 USAGE:
-   gopull-cli [global options] command [command options] [arguments...]
+   gopull [global options] command [command options] [arguments...]
 
 VERSION:
    0.0.1
@@ -118,8 +118,8 @@ COMMANDS:
      config   Configure the GoPull environment
      list     List configured local repos
      add      Add a new repository
-     edit     Edit an existing repository
-     delete   Delete a repository
+     edit     Edit an existing repository configuration.
+     delete   Delete a repository configuration.
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -129,14 +129,14 @@ GLOBAL OPTIONS:
 
 ### Configuring the GoPull Environment
 
-Variables used by GoPull can be set using `gopull-cli config`.  Passing no flags will simply print the currently configured values.  Passing the `--repos-dir` flag with a value will set the `REPOS_DIR` path. Similarly, passing the `--gopull-dir` flag with a value will set the `GOPULL_DIR`.
+Variables used by GoPull can be set using `gopull config`.  Passing no flags will simply print the currently configured values.  Passing the `--repos-dir` flag with a value will set the `REPOS_DIR` path. Similarly, passing the `--gopull-dir` flag with a value will set the `GOPULL_DIR`.
 
 ### Adding a New Repository
 
 In order to initialize a local managed repository, follow the instructions above for adding your ssh key to the remote as well as configuring the webhook.  Then use the command
 
 ```
-gopull-cli add --uri git@<REMOTE>:<USER>/<REPOSITORY> --branch <BRANCH>
+gopull add --uri git@<REMOTE>:<USER>/<REPOSITORY> --branch <BRANCH>
 ```
 
 This will clone the repository into `REPOS_DIR/<USER>/<REPOSITORY>`, add the configuration entry to `repos.json`, and copy the deployment script template.

@@ -11,7 +11,7 @@ func main() {
 	InitConfig()
 
 	app := cli.NewApp()
-	app.Name = "gopull-cli"
+	app.Name = "gopull"
 	app.Usage = "Configure the GoPull REST API to pull remote repo changes"
 	app.Version = "0.0.1"
 
