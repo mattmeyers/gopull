@@ -1,10 +1,2 @@
-*
-!/cmd
-!/cmd/*
-!/deployment_scripts/
-!/deployment_scripts/deploy.src.sh
-!*.go
-!*.src.json
-!.gitignore
-!LICENSE
-!README.md
+repos.json
+config.json
