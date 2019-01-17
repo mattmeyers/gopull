@@ -57,13 +57,19 @@ func main() {
 		},
 		{
 			Name:   "edit",
-			Usage:  "Edit an existing repository",
+			Usage:  "Edit an existing repository configuration.",
 			Action: handleEdit,
 		},
 		{
 			Name:   "delete",
-			Usage:  "Delete a repository",
+			Usage:  "Delete a repository configuration.",
 			Action: handleDelete,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "r",
+					Usage: "Completely remove the repository. The configured directory will be completely removed.",
+				},
+			},
 		},
 	}
 

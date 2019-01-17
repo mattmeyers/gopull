@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -79,6 +80,31 @@ func handleEdit(c *cli.Context) error {
 }
 
 func handleDelete(c *cli.Context) error {
-	fmt.Println("Deleted repo")
+	shouldDelete := c.Bool("r")
+
+	if len(c.Args()) != 1 {
+		cli.ShowCommandHelpAndExit(c, "delete", 1)
+	}
+
+	repo, err := DeleteLocalRepo(c.Args().First())
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	if err = os.Remove(os.ExpandEnv(repo.DeploymentScript)); err != nil {
+		panic(fmt.Errorf("fatal error deleting deployment script: %s", err))
+	}
+
+	if shouldDelete {
+		err = os.RemoveAll(os.ExpandEnv(repo.Path))
+		if err != nil {
+			panic(fmt.Errorf("fatal error deleting repo directory: %s", err))
+		}
+		fmt.Println("The repository directory has been deleted. You may still have to do additional cleanup such as removing process manager configurations.")
+	}
+
+	fmt.Printf("GoPull is no longer managing %s.\n", repo.Name)
+
 	return nil
 }

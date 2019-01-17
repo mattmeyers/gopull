@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -71,10 +72,18 @@ func GetLocalRepo(name string) LocalRepo {
 
 // DeleteLocalRepo deletes a local repository configuration from the
 // repos.json configuration file.
-func DeleteLocalRepo(repo string) {
+func DeleteLocalRepo(repoName string) (LocalRepo, error) {
 	repos := readInFile()
-	delete(repos, repo)
+	repo, ok := repos[repoName]
+	if ok {
+		delete(repos, repoName)
+	} else {
+		return repo, errors.New("provided name is not a managed repository")
+	}
+
 	writeToFile(repos)
+
+	return repo, nil
 }
 
 func readInFile() map[string]LocalRepo {
