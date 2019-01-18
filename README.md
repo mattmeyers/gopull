@@ -2,7 +2,7 @@
 
 GoPull is a lightweight REST API written in go that runs a deployment script after receiving a webhook request from Bitbucket, GitHub, or GitLab. All local repositories configured to work with GoPull must be placed in the same directory known as `REPOS_DIR`. In order for this API to access the remote repository, an SSH access key must be added to the remote. A webhook can then be configured to fire on any events supported by the remote (code push by default). When the API receives a request, it checks which branch was affected by the change. If this branch matches the configured branch of the local repository, then the corresponding deployment script is run.
 
-This API features a command line tool for easily adding new repositories or configuring current local repositories. By default, this tool assumes GoPull is installed in `$GOPATH/src/github.com/mattmeyers/gopull` and that all managed repositories are to be placed in `$HOME/repos`.  These paths can be configured with the command line tool itself.
+This API features a command line tool for easily adding new repositories or configuring current local repositories. By default, this tool assumes GoPull is installed in `$GOPATH/src/github.com/mattmeyers/gopull/gopull-api` and that all managed repositories are to be placed in `$HOME/repos`.  These paths can be configured with the command line tool itself.
 
 ## Installation
 

@@ -44,6 +44,6 @@ func InitConfig() {
 
 func setDefaults() {
 	viper.SetDefault("repos_dir", "$HOME/repos")
-	viper.SetDefault("gopull_dir", "$GOPATH/src/github.com/mattmeyers/gopull-api")
-	viper.SetDefault("scripts_dir", "$GOPATH/src/github.com/mattmeyers/gopull-api/deployment_scripts")
+	viper.SetDefault("gopull_dir", "$GOPATH/src/github.com/mattmeyers/gopull/gopull-api")
+	viper.SetDefault("scripts_dir", "$GOPATH/src/github.com/mattmeyers/gopull/gopull-api/deployment_scripts")
 }

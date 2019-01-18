@@ -13,12 +13,13 @@ import (
 func handleConfig(c *cli.Context) error {
 	reposDir := c.String("repos-dir")
 	gopullDir := c.String("gopull-dir")
+	scriptsDir := c.String("scripts-dir")
 
 	if reposDir != "" {
 		viper.Set("repos_dir", reposDir)
 		err := viper.WriteConfig()
 		if err != nil {
-			log.Fatalf("Failed to write to config\nerr: %s", err)
+			log.Fatalf("Failed to write repos_dir to config\nerr: %s", err)
 		}
 	}
 
@@ -26,7 +27,15 @@ func handleConfig(c *cli.Context) error {
 		viper.Set("gopull_dir", gopullDir)
 		err := viper.WriteConfig()
 		if err != nil {
-			log.Fatalf("Failed to write to config\nerr: %s", err)
+			log.Fatalf("Failed to write gopull_dir to config\nerr: %s", err)
+		}
+	}
+
+	if scriptsDir != "" {
+		viper.Set("scripts_dir", scriptsDir)
+		err := viper.WriteConfig()
+		if err != nil {
+			log.Fatalf("Failed to write scripts_dir to config\nerr: %s", err)
 		}
 	}
 
