@@ -44,7 +44,7 @@ systemctl start gopull.service
 
 Then check that the service started properly with `systemctl status gopull`.
 
-By default, GoPull runs on port 8080. A webserver such as Apache or Nginx can be used as a reverse proxy to avoid called the port directly. A very basic Nginx configuration without SSL is as follows
+By default, GoPull runs on port 8080. This port can be changed by passing the desired port number with th `-p` flag when starting the API.  A webserver such as Apache or Nginx can be used as a reverse proxy to avoid calling the port directly. A very basic Nginx configuration without SSL is as follows
 
 ```
 server {

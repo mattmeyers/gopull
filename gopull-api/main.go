@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	portPtr := flag.String("p", "8080", "The port to run the gopull-api on")
+	portPtr := flag.Int("p", 8080, "The port to run the gopull-api on")
 	flag.Parse()
 
 	router := NewRouter()
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *portPtr), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *portPtr), router))
 }
