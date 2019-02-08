@@ -4,11 +4,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/mattmeyers/gopull"
+
 	"github.com/urfave/cli"
 )
 
 func main() {
-	InitConfig()
+	gopull.NewConfig()
 
 	app := cli.NewApp()
 	app.Name = "gopull"

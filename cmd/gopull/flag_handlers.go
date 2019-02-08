@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mattmeyers/gopull"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
 )
@@ -40,14 +41,16 @@ func handleConfig(c *cli.Context) error {
 	}
 
 	for _, key := range viper.AllKeys() {
-		fmt.Printf("%s=%s\n", key, viper.GetString(key))
+		if path := strings.Split(key, "."); len(path) > 1 && path[0] == "paths" {
+			fmt.Printf("%s=%s\n", path[1], viper.GetString(key))
+		}
 	}
 
 	return nil
 }
 
 func handleList(c *cli.Context) error {
-	repos := GetAllLocalRepos()
+	repos := gopull.GetAllLocalRepos()
 	for _, repo := range repos {
 		fmt.Println(repo.FullName)
 	}
@@ -67,7 +70,7 @@ func handleAdd(c *cli.Context) error {
 	user := repoPathVars[0]
 	name := repoPathVars[1]
 
-	repo := LocalRepo{
+	repo := gopull.LocalRepo{
 		User:             user,
 		Name:             name,
 		FullName:         fullName,
@@ -76,7 +79,7 @@ func handleAdd(c *cli.Context) error {
 		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", viper.GetString("gopull_dir"), name),
 	}
 
-	GitClone(uri, repo)
+	gopull.GitClone(uri, repo)
 	repo.AddLocalRepo()
 	repo.InitDeploymentScript()
 
@@ -95,7 +98,7 @@ func handleDelete(c *cli.Context) error {
 		cli.ShowCommandHelpAndExit(c, "delete", 1)
 	}
 
-	repo, err := DeleteLocalRepo(c.Args().First())
+	repo, err := gopull.DeleteLocalRepo(c.Args().First())
 	if err != nil {
 		fmt.Println(err)
 		return nil

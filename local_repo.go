@@ -1,4 +1,4 @@
-package main
+package gopull
 
 import (
 	"encoding/json"
@@ -22,6 +22,7 @@ type LocalRepo struct {
 	User             string `json:"user"`
 	Name             string `json:"name"`
 	FullName         string `json:"fullName"`
+	Remote           string `json:"remote"`
 	Branch           string `json:"branch"`
 	Path             string `json:"path"`
 	DeploymentScript string `json:"deploymentScript"`
