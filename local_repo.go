@@ -31,21 +31,23 @@ type LocalRepo struct {
 // AddLocalRepo adds a new local repository configuration to the repos.json
 // configuration file.
 func (r LocalRepo) AddLocalRepo() {
-	repos := readInFile()
-	repos[r.FullName] = r
-	writeToFile(repos)
+	viper.Set(fmt.Sprintf("repos.%s", r.FullName), r)
+	if err := viper.WriteConfig(); err != nil {
+		panic(fmt.Sprintf("Error writing repo to config\n%s", err))
+	}
+
 }
 
 // InitDeploymentScript copies the sample deployment script for use with the
 // new local repository.
 func (r LocalRepo) InitDeploymentScript() {
-	from, err := os.Open(fmt.Sprintf("%s/deploy.src.sh", os.ExpandEnv(viper.GetString("scripts_dir"))))
+	from, err := os.Open(fmt.Sprintf("%s/deploy.src.sh", os.ExpandEnv(viper.GetString("paths.scripts_dir"))))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer from.Close()
 
-	newFilename := fmt.Sprintf("%s/%s_deploy.sh", os.ExpandEnv(viper.GetString("scripts_dir")), r.Name)
+	newFilename := fmt.Sprintf("%s/%s_deploy.sh", os.ExpandEnv(viper.GetString("paths.scripts_dir")), r.Name)
 	to, err := os.OpenFile(newFilename, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -88,12 +90,12 @@ func DeleteLocalRepo(repoName string) (LocalRepo, error) {
 }
 
 func readInFile() map[string]LocalRepo {
-	filePath := fmt.Sprintf("%s/repos.json", os.ExpandEnv(viper.GetString("gopull_dir")))
+	filePath := fmt.Sprintf("%s/repos.json", os.ExpandEnv(viper.GetString("paths.gopull_dir")))
 
 	var repos map[string]LocalRepo
 	configFile, err := os.Open(filePath)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to open repos.json\n%s", err))
+		panic(fmt.Sprintf("Failed to open config.json\n%s", err))
 	}
 	defer configFile.Close()
 

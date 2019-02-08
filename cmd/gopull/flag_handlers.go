@@ -65,18 +65,23 @@ func handleAdd(c *cli.Context) error {
 		cli.ShowCommandHelpAndExit(c, "add", 1)
 	}
 
-	fullName := strings.Replace(strings.SplitN(uri, ":", 2)[1], ".git", "", 1)
-	repoPathVars := strings.SplitN(fullName, "/", 2)
-	user := repoPathVars[0]
-	name := repoPathVars[1]
+	// uri is in the form git@<remote>:<user>/<repo>. This reformats to
+	// the path <remote>/<user>/<repo>
+	fullName := strings.SplitAfterN(uri, "@", 2)[1]
+	fullName = strings.Replace(fullName, ":", "/", 1)
+	fullName = strings.Replace(fullName, ".git", "", 1)
+	fullName = strings.Replace(fullName, ".org", "", 1)
+	fullName = strings.Replace(fullName, ".com", "", 1)
+	repoPathVars := strings.SplitN(fullName, "/", 3)
 
 	repo := gopull.LocalRepo{
-		User:             user,
-		Name:             name,
+		Remote:           repoPathVars[0],
+		User:             repoPathVars[1],
+		Name:             repoPathVars[2],
 		FullName:         fullName,
 		Branch:           branch,
-		Path:             fmt.Sprintf("%s/%s/%s", viper.GetString("repos_dir"), user, name),
-		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", viper.GetString("gopull_dir"), name),
+		Path:             fmt.Sprintf("%s/%s", viper.GetString("paths.repos_dir"), fullName),
+		DeploymentScript: fmt.Sprintf("%s/deployment_scripts/%s_deploy.sh", viper.GetString("paths.gopull_dir"), repoPathVars[2]),
 	}
 
 	gopull.GitClone(uri, repo)

@@ -59,8 +59,8 @@ func getCallerDir() string {
 func setDefaults() {
 	viper.SetDefault("paths", map[string]string{
 		"repos_dir":   "$HOME/repos",
-		"gopull_dir":  "$GOPATH/src/github.com/mattmeyers/gopull/gopull-api",
-		"scripts_dir": "$GOPATH/src/github.com/mattmeyers/gopull/gopull-api/deployment_scripts",
+		"gopull_dir":  "$GOPATH/src/github.com/mattmeyers/gopull/cmd/gopull-api",
+		"scripts_dir": "$GOPATH/src/github.com/mattmeyers/gopull/cmd/gopull-api/deployment_scripts",
 	})
 	viper.SetDefault("repos", map[string]map[string]string{})
 }
