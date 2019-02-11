@@ -22,20 +22,21 @@ import (
 //		- Gitlab: https://docs.gitlab.com/ee/ssh/
 func GitClone(uri string, repo LocalRepo) {
 	mkdir := exec.Command("mkdir", "-p", os.ExpandEnv(repo.Path))
-	out, err := mkdir.CombinedOutput()
+	_, err := mkdir.CombinedOutput()
 	if err != nil {
-		log.Printf("cmd.CombinedOutput() failed with %s\n", err)
+		log.Fatalf("cmd.CombinedOutput() failed with %s\n", err)
 	} else {
-		log.Printf("Created directory: %s/%s/%s\n", os.ExpandEnv(viper.GetString("paths.repos_dir")), repo.Remote, repo.User)
+		fmt.Printf("Created directory: %s/%s/%s\n", os.ExpandEnv(viper.GetString("paths.repos_dir")), repo.Remote, repo.User)
 	}
 
 	clone := exec.Command("git", "clone", "--single-branch", "--branch", repo.Branch, uri)
 	clone.Dir = os.ExpandEnv(viper.GetString("paths.repos_dir")) + "/" + repo.Remote + "/" + repo.User
-	out, err = clone.CombinedOutput()
+	_, err = clone.CombinedOutput()
 	if err != nil {
 		log.Fatalf("cmd.CombinedOutput() failed with %s\nDid you remember to add your SSH key to the remote?", err)
 	}
-	fmt.Printf("%s\n", string(out))
+	fmt.Printf("Successfully cloned %s!\n", repo.Name)
+
 }
 
 // GitPull runs a LocalRepo's deployment script.

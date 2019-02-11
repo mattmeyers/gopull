@@ -2,12 +2,12 @@ package gopull
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -31,7 +31,21 @@ type LocalRepo struct {
 // AddLocalRepo adds a new local repository configuration to the repos.json
 // configuration file.
 func (r LocalRepo) AddLocalRepo() {
-	viper.Set(fmt.Sprintf("repos.%s", r.FullName), r)
+	var repos map[string]map[string]map[string]LocalRepo
+
+	viper.UnmarshalKey("repos", &repos)
+
+	if repos[r.Remote] == nil {
+		repos[r.Remote] = map[string]map[string]LocalRepo{}
+	}
+
+	if repos[r.Remote][r.User] == nil {
+		repos[r.Remote][r.User] = map[string]LocalRepo{}
+	}
+
+	repos[r.Remote][r.User][r.Name] = r
+
+	viper.Set("repos", repos)
 	if err := viper.WriteConfig(); err != nil {
 		panic(fmt.Sprintf("Error writing repo to config\n%s", err))
 	}
@@ -60,33 +74,46 @@ func (r LocalRepo) InitDeploymentScript() {
 	}
 }
 
-// GetAllLocalRepos gets all of the repositories from the repos.json
-// configuration file.
+// GetAllLocalRepos gets all of the managed local repos.
 func GetAllLocalRepos() map[string]LocalRepo {
-	return readInFile()
+	var repos map[string]LocalRepo
+	viper.UnmarshalKey("repos", &repos)
+	return repos
 }
 
-// GetLocalRepo gets a single repository configuration from the repos.json
-// configuration file.
+// GetLocalRepo gets a single managed local repo.
 func GetLocalRepo(name string) LocalRepo {
-	repos := readInFile()
-	return repos[name]
+	var repo LocalRepo
+	viper.UnmarshalKey(fmt.Sprintf("repos.%s", name), &repo)
+	return repo
 }
 
-// DeleteLocalRepo deletes a local repository configuration from the
-// repos.json configuration file.
-func DeleteLocalRepo(repoName string) (LocalRepo, error) {
-	repos := readInFile()
-	repo, ok := repos[repoName]
-	if ok {
-		delete(repos, repoName)
-	} else {
-		return repo, errors.New("provided name is not a managed repository")
+// DeleteLocalRepo deletes a managed local repo.
+func DeleteLocalRepo(fullname string) (*LocalRepo, error) {
+	var repo *LocalRepo
+	path := strings.SplitN(fullname, "/", 3)
+
+	viper.UnmarshalKey(fmt.Sprintf("repos.%s.%s.%s", path[0], path[1], path[2]), &repo)
+	if repo == nil {
+		return repo, fmt.Errorf("no managed repo with full name %s", fullname)
+	}
+	delete(viper.Get(fmt.Sprintf("repos.%s.%s", path[0], path[1])).(map[string]interface{}), path[2])
+	if err := viper.WriteConfig(); err != nil {
+		return repo, err
 	}
 
-	writeToFile(repos)
-
 	return repo, nil
+	// repos := readInFile()
+	// repo, ok := repos[repoName]
+	// if ok {
+	// 	delete(repos, repoName)
+	// } else {
+	// 	return repo, errors.New("provided name is not a managed repository")
+	// }
+
+	// writeToFile(repos)
+
+	// return repo, nil
 }
 
 func readInFile() map[string]LocalRepo {

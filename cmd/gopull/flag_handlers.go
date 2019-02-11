@@ -92,7 +92,7 @@ func handleAdd(c *cli.Context) error {
 }
 
 func handleEdit(c *cli.Context) error {
-	fmt.Println("Edited repo")
+	fmt.Println("This has not been implemented yet. I only have so much time. Don't judge me.")
 	return nil
 }
 

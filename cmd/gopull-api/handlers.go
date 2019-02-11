@@ -6,6 +6,8 @@ import (
 	"html"
 	"net/http"
 	"strings"
+
+	"github.com/mattmeyers/gopull"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -31,10 +33,10 @@ func ReceiveGithub(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Github Repo Full Name: %s\n", repoFullName)
 	fmt.Printf("Github Branch Name: %s\n", branchName)
 
-	localRepo := GetLocalRepo(repoFullName)
+	localRepo := gopull.GetLocalRepo(repoFullName)
 
 	if branchName == localRepo.Branch {
-		GitPull(localRepo)
+		gopull.GitPull(localRepo)
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
@@ -69,10 +71,10 @@ func ReceiveBitbucket(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Bitbucket Repo Full Name: %s\n", repoFullName)
 	fmt.Printf("Bitbucket Branch Name: %s\n", branchName)
 
-	localRepo := GetLocalRepo(repoFullName)
+	localRepo := gopull.GetLocalRepo(repoFullName)
 
 	if branchName == localRepo.Branch {
-		GitPull(localRepo)
+		gopull.GitPull(localRepo)
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
@@ -107,10 +109,10 @@ func ReceiveGitlab(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Gitlab Repo Full Name: %s\n", repoFullName)
 	fmt.Printf("Gitlab Branch Name: %s\n", branchName)
 
-	localRepo := GetLocalRepo(repoFullName)
+	localRepo := gopull.GetLocalRepo(repoFullName)
 
 	if branchName == localRepo.Branch {
-		GitPull(localRepo)
+		gopull.GitPull(localRepo)
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
